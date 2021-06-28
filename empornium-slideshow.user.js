@@ -4,14 +4,15 @@
 //              Click SLIDESHOW button at top of title page.
 //              Navigation: Left/Right arrows, Esc or click outside of modal to close slideshow.
 //              Features:
-//                - Lazy loads current and next thumbnailed full images on next/prev navigation.
-//                - Clickable to view full image
+//                - Lazy loads images for fast performance and bandwidth saving.
+//                - Click image to view full version
 //                - Navigation hotkeys for quick and easy perusing
+//                - Caches images for faster subsequent loads
 //                - Excludes:
 //                  - .gifs for faster performance
 //                  - Title images
 //                  - Very small images (if thumbnail, it will display the larger version)
-//              
+//
 // @namespace   Empornium Scripts
 // @version     1.0.4
 // @author      vandenium
@@ -43,123 +44,127 @@
 // ==/UserScript==
 
 const template = `
-<style>
-* {
-  box-sizing: border-box;
-}
-
-#slideshow {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: none;
-  z-index: 100;
-  top: 50%;
-  
-}
-
-/* Slideshow container */
-.slideshow-container {
-  max-width: 1000px;
-  width: 100%;
-  position: relative;
-  margin: auto;
-}
-
-.slideshow-image {
-  /*     min-width: 800px; */
-  max-height: 800px;
-}
-
-.slides {
-  display: inline-block;
-}
-
-  
-  .slide {
-    display: block;
-    width: 1024px;
-    height: 768px;
-    background-color: rgba(0, 0, 0, 0.4);
-    border-radius: 5px;
-  }
-
-/* Next & previous buttons */
-.prev,
-.next {
-  cursor: pointer;
-  position: absolute;
-  top: 50%;
-  width: auto;
-  margin-top: -22px;
-  padding: 16px;
-  color: white;
-  font-weight: bold;
-  font-size: 18px;
-  transition: 0.6s ease;
-  border-radius: 0 3px 3px 0;
-  user-select: none;
-}
-
-.close {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  background-color: rgba(0, 0, 0, 0.4);
-  color: white;
-  border-radius: 18px;
-  font-size: 19px;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
-  text-align: center;
-  padding: 1px 1px;
-}
-
-.close:hover {
-  background-color: rgba(0, 0, 0, 0.6);
-  text-decoration: none;
-  color: white;
-}
-
-.next {
-  right: 0;
-  border-radius: 3px 0 0 3px;
-}
-
-.prev:hover,
-.next:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-  text-decoration: none;
-}
-
-.text {
-  color: #f2f2f2;
-  font-size: 15px;
-  padding: 8px 12px;
-  position: absolute;
-  bottom: 8px;
-  width: 100%;
-  text-align: center;
-}
-
-.numbertext {
-  color: #f2f2f2;
-  font-size: 15px;
-  padding: 8px 12px;
-  position: absolute;
-  top: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  border-radius: 3px;
-}
-</style>
-
-<div class="slideshow-container" id="slideshow-container"></div>
-`;
-
+    <style>
+    * {
+      box-sizing: border-box;
+    }
+     
+    #slideshow {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      z-index: 100;
+      top: 50%;
+      
+    }
+     
+    /* Slideshow container */
+    .slideshow-container {
+      max-width: 1000px;
+      width: 100%;
+      position: relative;
+      margin: auto;
+    }
+     
+    .slideshow-image {
+      /*     min-width: 800px; */
+      max-height: 800px;
+    }
+     
+    .slides {
+      display: inline-block;
+    }
+     
+      
+      .slide {
+        display: block;
+        width: 1024px;
+        height: 768px;
+        background-color: rgba(0, 0, 0, 0.4);
+        border-radius: 5px;
+      }
+     
+    /* Next & previous buttons */
+    .prev,
+    .next {
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      width: auto;
+      margin-top: -22px;
+      padding: 16px;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      transition: 0.6s ease;
+      border-radius: 0 3px 3px 0;
+      user-select: none;
+    }
+     
+    .close {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      background-color: rgba(0, 0, 0, 0.4);
+      color: white;
+      border-radius: 18px;
+      font-size: 19px;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      padding: 1px 1px;
+    }
+     
+    .close:hover {
+      background-color: rgba(0, 0, 0, 0.6);
+      text-decoration: none;
+      color: white;
+    }
+     
+    .next {
+      right: 0;
+      border-radius: 3px 0 0 3px;
+    }
+     
+    .prev:hover,
+    .next:hover {
+      background-color: rgba(0, 0, 0, 0.8);
+      text-decoration: none;
+    }
+     
+    .text {
+      color: #f2f2f2;
+      font-size: 15px;
+      padding: 8px 12px;
+      position: absolute;
+      bottom: 8px;
+      width: 100%;
+      text-align: center;
+    }
+     
+    .numbertext {
+      color: #f2f2f2;
+      font-size: 15px;
+      padding: 8px 12px;
+      position: absolute;
+      top: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      border-radius: 3px;
+    }
+    </style>
+     
+    <div class="slideshow-container" id="slideshow-container"></div>
+    `;
 
 document.querySelector("body").addEventListener("click", (e) => {
-  if (e.target.localName !== "img" && e.target.innerText !== "SLIDESHOW" && e.target.className !== 'next' && e.target.className !== 'prev') {
+  if (
+    e.target.localName !== "img" &&
+    e.target.innerText !== "SLIDESHOW" &&
+    e.target.className !== "next" &&
+    e.target.className !== "prev"
+  ) {
     document.querySelector("#slideshow").style.display = "none";
   }
 });
@@ -178,34 +183,34 @@ function showSlides(n) {
   for (i = 0; i < slides.length; i++) {
     slides[i].style.display = "none";
   }
-  
+
   // Lazy load full image of current and next slides
   const currentSlideImage = slides[slideIndex].lastChild;
-  const nextSlideImage = slides[slideIndex + 1] && slides[slideIndex + 1].lastChild;
-  
+  const nextSlideImage =
+    slides[slideIndex + 1] && slides[slideIndex + 1].lastChild;
+
   if (currentSlideImage && currentSlideImage.srcFull) {
     currentSlideImage.onload = () => {
-       currentSlideImage.style.display = 'block';
-      
-      currentSlideImage.parentNode.style.width = 'auto';
-      currentSlideImage.parentNode.style.height = 'auto';
-    }
+      currentSlideImage.style.display = "block";
+
+      currentSlideImage.parentNode.style.width = "auto";
+      currentSlideImage.parentNode.style.height = "auto";
+    };
     currentSlideImage.src = currentSlideImage.srcFull;
-    
+
     if (nextSlideImage && nextSlideImage.srcFull) {
-      
       nextSlideImage.onload = () => {
-        nextSlideImage.style.display = 'block';
-        nextSlideImage.parentNode.style.width = 'auto';
-        nextSlideImage.parentNode.style.height = 'auto';
-      }
+        nextSlideImage.style.display = "block";
+        nextSlideImage.parentNode.style.width = "auto";
+        nextSlideImage.parentNode.style.height = "auto";
+      };
       nextSlideImage.src = nextSlideImage.srcFull;
     }
   } else {
-    currentSlideImage.parentNode.style.width = 'auto';
-    currentSlideImage.parentNode.style.height = 'auto';
+    currentSlideImage.parentNode.style.width = "auto";
+    currentSlideImage.parentNode.style.height = "auto";
   }
-  
+
   slides[slideIndex].style.display = "block";
 }
 
@@ -250,7 +255,7 @@ const createTemplateDOM = (str) => {
 const render = (target, renderPromise) => {
   const templateDOM = createTemplateDOM(template);
   const handle = createSlideShowMessage();
-  
+
   renderPromise(templateDOM).then((updatedTemplateDOM) => {
     clearInterval(handle);
     createSlideShowButton();
@@ -259,7 +264,7 @@ const render = (target, renderPromise) => {
 
     // Set up eventing
     const container = updatedTemplateDOM.children[1].parentNode;
-    console.log(container)
+    console.log(container);
     const nextButton = container.querySelector(".next");
     const previousButton = container.querySelector(".prev");
     const closeButton = container.querySelector(".close");
@@ -275,9 +280,9 @@ const render = (target, renderPromise) => {
     closeButton.addEventListener("click", (e) => {
       container.style.display = "none";
     });
-    
+
     document.onkeydown = (e) => {
-      if (container.style.display !== 'none') {
+      if (container.style.display !== "none") {
         if (e.keyCode === 37) {
           e.preventDefault();
           previousButton.dispatchEvent(new Event("click"));
@@ -301,8 +306,8 @@ const render = (target, renderPromise) => {
 
 const createSlide = (imgNode, n, total) => {
   const innerTemplate = `
-    <div class="numbertext">${n + 1}/${total}</div>
-  `;
+        <div class="numbertext">${n + 1}/${total}</div>
+      `;
 
   const templateParent = document.createElement("div");
   templateParent.className = "slide";
@@ -326,11 +331,17 @@ const openAllHiddenImages = () =>
     }, 0);
   });
 
-
-const isImageTitle = (img) => img.width / img.height > 5 || img.src.includes('s7s-') || img.src.includes('s7s_');
-const isHostedImage = (img) => img.src.includes("fapping") || img.src.includes("jerking") || img.src.includes("freeimage");
+const isImageTitle = (img) =>
+  img.width / img.height > 5 ||
+  img.src.includes("s7s-") ||
+  img.src.includes("s7s_");
+const isHostedImage = (img) =>
+  img.src.includes("fapping") ||
+  img.src.includes("jerking") ||
+  img.src.includes("freeimage");
 const isImageSmall = (img) => img.width * img.height < 30000;
-const isThumbnail = (img) => img.src.includes(".md.") || img.src.includes(".th.");
+const isThumbnail = (img) =>
+  img.src.includes(".md.") || img.src.includes(".th.");
 const isImageGif = (img) => img.src.includes(".gif");
 
 const renderContent = (templateDOM) =>
@@ -342,7 +353,7 @@ const renderContent = (templateDOM) =>
       const allImages = Array.from(body.querySelectorAll("img"));
       let counter = 0;
 
-      const nonGifImages = allImages.filter(img => !isImageGif(img));
+      const nonGifImages = allImages.filter((img) => !isImageGif(img));
       const len = nonGifImages.length;
 
       nonGifImages.forEach(function (img) {
@@ -353,7 +364,6 @@ const renderContent = (templateDOM) =>
       function incrementCounter() {
         counter++;
         if (counter === len) {
-
           // Non-thumbnailed images
           const images = Array.from(allImages).filter(
             (img) =>
@@ -372,7 +382,7 @@ const renderContent = (templateDOM) =>
 
           images.forEach((img) => {
             const clonedNode = img.cloneNode(true);
-            clonedNode.className += ' slideshow-image';
+            clonedNode.className += " slideshow-image";
             clonedNode.style.width = "auto";
             clonedNode.style.height = "300";
             clonedNode.style.margin = 0;
@@ -382,12 +392,12 @@ const renderContent = (templateDOM) =>
           const clonedThumbNailedImages = [];
           thumbNailedImages.forEach((img) => {
             const clonedNode = img.cloneNode(true);
-            clonedNode.className += ' slideshow-image';
+            clonedNode.className += " slideshow-image";
             clonedNode.style.width = "auto";
             clonedNode.style.height = "300";
             clonedNode.style.margin = 0;
             clonedNode.srcFull = clonedNode.src.replace(/\.th|\.md/g, "");
-            clonedNode.style.display = 'none';
+            clonedNode.style.display = "none";
             clonedThumbNailedImages.push(clonedNode);
           });
 
@@ -416,7 +426,7 @@ const renderContent = (templateDOM) =>
           closeButton.innerText = "✖";
 
           const container = templateDOM.children[1];
-          
+
           container.appendChild(prevLinkButton);
 
           // append images

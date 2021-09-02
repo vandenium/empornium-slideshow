@@ -14,7 +14,7 @@
 //                  - Very small images (if thumbnail, it will display the larger version)
 //              
 // @namespace   Empornium Scripts
-// @version     1.0.5
+// @version     1.0.6
 // @author      vandenium
 // @grant       none
 // ---
@@ -27,6 +27,8 @@
 // ==/UserScript==
 
 // Changelog:
+// Version 1.0.6
+//  - Remove global box-sizing css entry that was affecting display of items outside of this userscript.
 // Version 1.0.5
 //  - Fix issue of changing the shown/hidden status of sections in the torrent page
 // Version 1.0.4
@@ -48,10 +50,6 @@ let descriptionShowHideClicked = false;
 
 const template = `
 <style>
-* {
-  box-sizing: border-box;
-}
-
 #slideshow {
   position: absolute;
   left: 50%;

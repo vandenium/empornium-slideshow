@@ -12,9 +12,9 @@
 //                  - .gifs for faster performance
 //                  - Title images
 //                  - Very small images (if thumbnail, it will display the larger version)
-//              
+//
 // @namespace   Empornium Scripts
-// @version     1.0.6
+// @version     1.1.0
 // @author      vandenium
 // @grant       none
 // ---
@@ -27,6 +27,8 @@
 // ==/UserScript==
 
 // Changelog:
+// Version 1.1.0
+//  - Enable gifs in slideshow.
 // Version 1.0.6
 //  - Remove global box-sizing css entry that was affecting display of items outside of this userscript.
 // Version 1.0.5
@@ -159,17 +161,17 @@ const template = `
 <div class="slideshow-container" id="slideshow-container"></div>
 `;
 
-document.querySelector("body").addEventListener("click", (e) => {
-  if (e.target.localName !== "img" && e.target.innerText !== "SLIDESHOW" && e.target.className !== 'next' && e.target.className !== 'prev') {
-    document.querySelector("#slideshow").style.display = "none";
+document.querySelector('body').addEventListener('click', (e) => {
+  if (e.target.localName !== 'img' && e.target.innerText !== 'SLIDESHOW' && e.target.className !== 'next' && e.target.className !== 'prev') {
+    document.querySelector('#slideshow').style.display = 'none';
   }
 });
 
-var slideIndex = 0;
+let slideIndex = 0;
 
 function showSlides(n) {
-  var i;
-  var slides = document.querySelectorAll(".slide");
+  let i;
+  const slides = document.querySelectorAll('.slide');
   if (n >= slides.length) {
     slideIndex = 0;
   }
@@ -177,7 +179,7 @@ function showSlides(n) {
     slideIndex = slides.length - 1;
   }
   for (i = 0; i < slides.length; i++) {
-    slides[i].style.display = "none";
+    slides[i].style.display = 'none';
   }
 
   // Lazy load full image of current and next slides
@@ -190,16 +192,15 @@ function showSlides(n) {
 
       currentSlideImage.parentNode.style.width = 'auto';
       currentSlideImage.parentNode.style.height = 'auto';
-    }
+    };
     currentSlideImage.src = currentSlideImage.srcFull;
 
     if (nextSlideImage && nextSlideImage.srcFull) {
-
       nextSlideImage.onload = () => {
         nextSlideImage.style.display = 'block';
         nextSlideImage.parentNode.style.width = 'auto';
         nextSlideImage.parentNode.style.height = 'auto';
-      }
+      };
       nextSlideImage.src = nextSlideImage.srcFull;
     }
   } else {
@@ -207,43 +208,43 @@ function showSlides(n) {
     currentSlideImage.parentNode.style.height = 'auto';
   }
 
-  slides[slideIndex].style.display = "block";
+  slides[slideIndex].style.display = 'block';
 }
 
 const createSlideShowButton = () => {
-  const showSliderButton = document.createElement("a");
-  showSliderButton.className = "button blueButton";
-  showSliderButton.innerText = "SLIDESHOW";
+  const showSliderButton = document.createElement('a');
+  showSliderButton.className = 'button blueButton';
+  showSliderButton.innerText = 'SLIDESHOW';
 
   // Remove loading message.
-  const loadingMessage = document.querySelector("#slideshow-loading-message");
+  const loadingMessage = document.querySelector('#slideshow-loading-message');
   loadingMessage.remove();
 
   document
-    .querySelector(".torrent_buttons .torrent_buttons")
+    .querySelector('.torrent_buttons .torrent_buttons')
     .appendChild(showSliderButton);
-  showSliderButton.addEventListener("click", () => {
-    document.querySelector("#slideshow").style.display = "inherit";
+  showSliderButton.addEventListener('click', () => {
+    document.querySelector('#slideshow').style.display = 'inherit';
   });
 };
 
 const createSlideShowMessage = () => {
-  const showSliderButton = document.createElement("span");
-  showSliderButton.id = "slideshow-loading-message";
-  showSliderButton.innerText = "Creating Slideshow";
+  const showSliderButton = document.createElement('span');
+  showSliderButton.id = 'slideshow-loading-message';
+  showSliderButton.innerText = 'Creating Slideshow';
   const handle = window.setInterval(() => {
-    showSliderButton.innerText += ".";
+    showSliderButton.innerText += '.';
   }, 500);
 
   document
-    .querySelector(".torrent_buttons .torrent_buttons")
+    .querySelector('.torrent_buttons .torrent_buttons')
     .appendChild(showSliderButton);
   return handle;
 };
 
 const createTemplateDOM = (str) => {
-  const template = document.createElement("div");
-  template.id = "slideshow";
+  const template = document.createElement('div');
+  template.id = 'slideshow';
   template.innerHTML = str;
   return template;
 };
@@ -260,37 +261,37 @@ const render = (target, renderPromise) => {
 
     // Set up eventing
     const container = updatedTemplateDOM.children[1].parentNode;
-    const nextButton = container.querySelector(".next");
-    const previousButton = container.querySelector(".prev");
-    const closeButton = container.querySelector(".close");
+    const nextButton = container.querySelector('.next');
+    const previousButton = container.querySelector('.prev');
+    const closeButton = container.querySelector('.close');
 
-    nextButton.addEventListener("click", (e) => {
+    nextButton.addEventListener('click', (e) => {
       showSlides((slideIndex += 1));
     });
 
-    previousButton.addEventListener("click", (e) => {
+    previousButton.addEventListener('click', (e) => {
       showSlides((slideIndex -= 1));
     });
 
-    closeButton.addEventListener("click", (e) => {
-      container.style.display = "none";
+    closeButton.addEventListener('click', (e) => {
+      container.style.display = 'none';
     });
 
     document.onkeydown = (e) => {
       if (container.style.display !== 'none') {
         if (e.keyCode === 37) {
           e.preventDefault();
-          previousButton.dispatchEvent(new Event("click"));
+          previousButton.dispatchEvent(new Event('click'));
         }
 
         if (e.keyCode === 39) {
           e.preventDefault();
-          nextButton.dispatchEvent(new Event("click"));
+          nextButton.dispatchEvent(new Event('click'));
         }
 
         if (e.keyCode === 27) {
           e.preventDefault();
-          container.style.display = "none";
+          container.style.display = 'none';
         }
       }
     };
@@ -304,153 +305,140 @@ const createSlide = (imgNode, n, total) => {
     <div class="numbertext">${n + 1}/${total}</div>
   `;
 
-  const templateParent = document.createElement("div");
-  templateParent.className = "slide";
+  const templateParent = document.createElement('div');
+  templateParent.className = 'slide';
   templateParent.innerHTML = innerTemplate;
   templateParent.appendChild(imgNode);
   return templateParent;
 };
 
-const openAllHiddenImages = () =>
-  new Promise((resolve, reject) => {
-    window.setTimeout(() => {
-      // open the Description area if it isn't already.
-      const descriptionToggle = document.querySelector('#desctoggle');
+const openAllHiddenImages = () => new Promise((resolve, reject) => {
+  window.setTimeout(() => {
+    // open the Description area if it isn't already.
+    const descriptionToggle = document.querySelector('#desctoggle');
 
-      // Get visibility of description area (need to restore this)
-      const descriptionIsHiddenInitially = document.querySelector('div#descbox').style.display === 'none';
+    // Get visibility of description area (need to restore this)
+    const descriptionIsHiddenInitially = document.querySelector('div#descbox').style.display === 'none';
 
-      if (descriptionIsHiddenInitially) {
-        descriptionToggle.dispatchEvent(new Event("click"));
-        descriptionShowHideClicked = true;
-      }
+    if (descriptionIsHiddenInitially) {
+      descriptionToggle.dispatchEvent(new Event('click'));
+      descriptionShowHideClicked = true;
+    }
 
-      // Show all hidden images within the Description area
-      const showLinks = Array.from(document.querySelectorAll("div#descbox a")).filter(
-        (node) =>
-          node.innerText.includes("Show") &&
-          node.id !== "open_overflowquickpost"
-      );
-      if (showLinks.length > 0) {
-        showLinks.forEach((el) => el.dispatchEvent(new Event("click")));
-      }
-      return resolve(true);
-    }, 0);
-  });
-
+    // Show all hidden images within the Description area
+    const showLinks = Array.from(document.querySelectorAll('div#descbox a')).filter(
+      (node) => node.innerText.includes('Show')
+          && node.id !== 'open_overflowquickpost',
+    );
+    if (showLinks.length > 0) {
+      showLinks.forEach((el) => el.dispatchEvent(new Event('click')));
+    }
+    return resolve(true);
+  }, 0);
+});
 
 const isImageTitle = (img) => img.width / img.height > 4.1 || img.src.includes('s7s-') || img.src.includes('s7s_');
-const isHostedImage = (img) => img.src.includes("fapping") || img.src.includes("jerking") || img.src.includes("freeimage");
+const isHostedImage = (img) => img.src.includes('fapping') || img.src.includes('jerking') || img.src.includes('freeimage');
 const isImageSmall = (img) => img.width * img.height < 30000;
-const isThumbnail = (img) => img.src.includes(".md.") || img.src.includes(".th.");
-const isImageGif = (img) => img.src.includes(".gif");
+const isThumbnail = (img) => img.src.includes('.md.') || img.src.includes('.th.');
 
-const renderContent = (templateDOM) =>
-  new Promise((resolve, reject) => {
-    openAllHiddenImages().then((links) => {
-      const body = document.querySelector(".body");
+const renderContent = (templateDOM) => new Promise((resolve, reject) => {
+  openAllHiddenImages().then((links) => {
+    const body = document.querySelector('.body');
 
-      // Wait for all non-gif images to load.
-      const allImages = Array.from(body.querySelectorAll("img"));
-      let counter = 0;
+    // Wait for all non-gif images to load.
+    const allImages = Array.from(body.querySelectorAll('img'));
+    const len = allImages.length;
+    let counter = 0;
 
-      const nonGifImages = allImages.filter(img => !isImageGif(img));
-      const len = nonGifImages.length;
-
-      nonGifImages.forEach(function (img) {
-        if (img.complete) incrementCounter();
-        else img.addEventListener("load", incrementCounter, false);
-      });
-
-      function incrementCounter() {
-        counter++;
-        if (counter === len) {
-
-          // Non-thumbnailed images
-          const images = Array.from(allImages).filter(
-            (img) =>
-              isHostedImage(img) &&
-              !isThumbnail(img) &&
-              !isImageGif(img) &&
-              !isImageSmall(img) &&
-              !isImageTitle(img)
-          );
-
-          // Thumbnailed images.
-          const thumbNailedImages = Array.from(allImages).filter(isThumbnail);
-
-          const imagesLength = images.length;
-          const clonedImages = [];
-
-          images.forEach((img) => {
-            const clonedNode = img.cloneNode(true);
-            clonedNode.className += ' slideshow-image';
-            clonedNode.style.width = "auto";
-            clonedNode.style.height = "300";
-            clonedNode.style.margin = 0;
-            clonedImages.push(clonedNode);
-          });
-
-          const clonedThumbNailedImages = [];
-          thumbNailedImages.forEach((img) => {
-            const clonedNode = img.cloneNode(true);
-            clonedNode.className += ' slideshow-image';
-            clonedNode.style.width = "auto";
-            clonedNode.style.height = "300";
-            clonedNode.style.margin = 0;
-            clonedNode.srcFull = clonedNode.src.replace(/\.th|\.md/g, "");
-            clonedNode.style.display = 'none';
-            clonedThumbNailedImages.push(clonedNode);
-          });
-
-          const slides = [];
-          const totalImages =
-            clonedImages.length + clonedThumbNailedImages.length;
-
-          clonedThumbNailedImages.forEach((clonedImage, i) => {
-            slides.push(createSlide(clonedImage, i, totalImages));
-          });
-
-          clonedImages.forEach((clonedImage, i) => {
-            slides.push(createSlide(clonedImage, i, totalImages));
-          });
-
-          const prevLinkButton = document.createElement("a");
-          prevLinkButton.className = "prev";
-          prevLinkButton.innerText = "❮";
-
-          const nextLinkButton = document.createElement("a");
-          nextLinkButton.className = "next";
-          nextLinkButton.innerText = "❯";
-
-          const closeButton = document.createElement("a");
-          closeButton.className = "close";
-          closeButton.innerText = "✖";
-
-          const container = templateDOM.children[1];
-
-          container.appendChild(prevLinkButton);
-
-          // append images
-          slides.forEach((slide) => {
-            container.appendChild(slide);
-          });
-
-          container.appendChild(nextLinkButton);
-
-          container.appendChild(closeButton);
-
-          // restore state of Description area (click it again it was clicked)
-          if (descriptionShowHideClicked) {
-            document.querySelector('#desctoggle').dispatchEvent(new Event("click"));
-          }
-
-          return resolve(templateDOM);
-        }
-      }
+    allImages.forEach((img) => {
+      if (img.complete) incrementCounter();
+      else img.addEventListener('load', incrementCounter, false);
     });
+
+    function incrementCounter() {
+      counter++;
+      if (counter === len) {
+        // Non-thumbnailed images
+        const images = Array.from(allImages).filter(
+          (img) => isHostedImage(img)
+              && !isThumbnail(img)
+              && !isImageSmall(img)
+              && !isImageTitle(img),
+        );
+
+        // Thumbnailed images.
+        const thumbNailedImages = Array.from(allImages).filter(isThumbnail);
+
+        const clonedImages = [];
+
+        images.forEach((img) => {
+          const clonedNode = img.cloneNode(true);
+          clonedNode.className += ' slideshow-image';
+          clonedNode.style.width = 'auto';
+          clonedNode.style.height = '300';
+          clonedNode.style.margin = 0;
+          clonedImages.push(clonedNode);
+        });
+
+        const clonedThumbNailedImages = [];
+        thumbNailedImages.forEach((img) => {
+          const clonedNode = img.cloneNode(true);
+          clonedNode.className += ' slideshow-image';
+          clonedNode.style.width = 'auto';
+          clonedNode.style.height = '300';
+          clonedNode.style.margin = 0;
+          clonedNode.srcFull = clonedNode.src.replace(/\.th|\.md/g, '');
+          clonedNode.style.display = 'none';
+          clonedThumbNailedImages.push(clonedNode);
+        });
+
+        const slides = [];
+        const totalImages = clonedImages.length + clonedThumbNailedImages.length;
+
+        clonedThumbNailedImages.forEach((clonedImage, i) => {
+          slides.push(createSlide(clonedImage, i, totalImages));
+        });
+
+        clonedImages.forEach((clonedImage, i) => {
+          slides.push(createSlide(clonedImage, i, totalImages));
+        });
+
+        const prevLinkButton = document.createElement('a');
+        prevLinkButton.className = 'prev';
+        prevLinkButton.innerText = '❮';
+
+        const nextLinkButton = document.createElement('a');
+        nextLinkButton.className = 'next';
+        nextLinkButton.innerText = '❯';
+
+        const closeButton = document.createElement('a');
+        closeButton.className = 'close';
+        closeButton.innerText = '✖';
+
+        const container = templateDOM.children[1];
+
+        container.appendChild(prevLinkButton);
+
+        // append images
+        slides.forEach((slide) => {
+          container.appendChild(slide);
+        });
+
+        container.appendChild(nextLinkButton);
+
+        container.appendChild(closeButton);
+
+        // restore state of Description area (click it again it was clicked)
+        if (descriptionShowHideClicked) {
+          document.querySelector('#desctoggle').dispatchEvent(new Event('click'));
+        }
+
+        return resolve(templateDOM);
+      }
+    }
   });
+});
 
-
-const target = document.querySelectorAll(".linkbox")[2];
+const target = document.querySelectorAll('.linkbox')[2];
 render(target, renderContent);
